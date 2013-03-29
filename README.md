@@ -62,6 +62,28 @@ $xml = $dom->saveXML();
 
 echo $xml;
 ```
+Outputs:
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<books type="fiction">
+  <book author="George Orwell">
+    <title>1984</title>
+  </book>
+  <book author="Lojze Slak">
+    <title>S harmoniko po svetu</title>
+  </book>
+  <book author="Isaac Asimov">
+    <title><![CDATA[Foundation]]></title>
+    <price>$15.61</price>
+  </book>
+  <book author="Robert A Heinlein">
+    <title><![CDATA[Stranger in a Strange Land]]></title>
+    <special discount="10%">10$</special>
+    <price>$43.29</price>
+  </book>
+</books>
+```
+
 
 TODO:
 ----
