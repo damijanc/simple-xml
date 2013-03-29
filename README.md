@@ -90,5 +90,7 @@ TODO:
 
 - improve error handling
 - fix code comments
+- remove non printable chars
+- make more examples
 - ...
 
