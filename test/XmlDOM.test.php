@@ -1,6 +1,6 @@
 <?php
 
-require_once 'XmlDOM.class.php';
+require_once dirname( dirname(__FILE__) ) . '/XmlDOM.class.php';
 
 //complex example
 $arr = array(
@@ -65,6 +65,16 @@ $dom = new XmlDOM('1.0', 'utf-8');
 $dom->formatOutput = true;
 $dom->generateXML($arr, 'issue');
 
+$xml = $dom->saveXML();
+
+echo $xml;
+
+
+
+//generation of xml from CSV
+$dom = new XmlDOM('1.0', 'utf-8');
+$dom->formatOutput = true;
+$dom->generateFromCSV(dirname(__FILE__).'/1968_69_Bayern_Munich.csv', 'players', 'player',',', 'de_DE');
 $xml = $dom->saveXML();
 
 echo $xml;

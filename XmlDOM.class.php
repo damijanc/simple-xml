@@ -21,6 +21,13 @@ class XmlDOM extends DOMDocument {
     return $in_str;
   }
 
+  /**
+   * Generates XML from array
+   * @param array $mixed array to generate xml from
+   * @param type $NodeName
+   * @param DOMElement $parentElement
+   * @throws Exception
+   */
   public function generateXML (array $mixed, $NodeName, DOMElement &$parentElement = null) {
 
     if (empty($NodeName))
@@ -68,6 +75,23 @@ class XmlDOM extends DOMDocument {
     }
   }
 
+
+  /**
+   * Generates XML from CSV file, where first line must be column names
+   * @param type $file path to CSV file
+   * @param type $rootNodeName root xml element name, defaults to elements
+   * @param type $nodeName node name for child element, defaults to element
+   * @param type $delimiter delimiter for csv, defaults to comma
+   * @param type $locale locate to be used when reading CSV, defaults to en_US
+   */
+  public function generateFromCSV($file, $rootNodeName = 'elements', $nodeName= 'element',
+                                      $delimiter = ',', $locale  = 'en_US') {
+
+    $t = $this->LoadCSV($file, $delimiter, $locale);
+    $arr[$nodeName] = $t;
+    $this->generateXML($arr,$rootNodeName);
+  }
+
   private function MakeElement (&$domElement, &$parentElement, $NodeName) {
     if (is_null($domElement)) {
       $domElement = $this->createElement($NodeName);
@@ -99,6 +123,43 @@ class XmlDOM extends DOMDocument {
       foreach ($arr as $value) {
         $domElement->appendChild($this->createCDATASection($value));
       }
+    }
+  }
+
+
+  private function LoadCSV($file, $delimiter = ',', $locale  = 'en_US') {
+
+    if (!is_file($file)) {
+      throw new Exception('File ' . $file . ' does not exist.');
+      return;
+    }
+
+    //output array
+    $out = array();
+
+    //we must set locale in order to parse CSV correctly
+    //http://static.zend.com/topics/multibyte-fgetcsv.pdf
+    setlocale(LC_ALL, $locale);
+
+    //open file for reading
+    if (($handle = fopen($file, 'r')) !== FALSE) {
+
+      //we will not limit the line lenght
+      $keys = fgetcsv($handle, 0, $delimiter); //get header
+
+      while (($data = fgetcsv($handle, 0, $delimiter)) !== FALSE) {
+        $t= array();
+        if (count($data) == count($keys)) {
+          for ($index = 0; $index < count($data); $index++) {
+            $t[$keys[$index]] = $data[$index];
+          }
+          $out[]= $t;
+        }
+
+      }
+      fclose($handle);
+
+      return $out;
     }
   }
 
