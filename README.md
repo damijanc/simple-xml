@@ -56,7 +56,7 @@ $arr = array(
 
 $dom = new XmlDOM('1.0', 'utf-8');
 $dom->formatOutput = true;
-$dom->generateXML($arr,'books');
+$dom->BuildDOM($arr,'books');
 
 $xml = $dom->saveXML();
 
@@ -89,8 +89,8 @@ TODO:
 ----
 
 - improve error handling
-- fix code comments
 - remove non printable chars
-- make more examples
 - ...
 
+
+Check CHANGELOG for updates.
