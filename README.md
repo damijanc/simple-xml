@@ -84,6 +84,36 @@ Outputs:
 </books>
 ```
 
+```json
+[
+  [
+    [
+      {
+         "publishTime": "18.01.2013 11:09:39"
+      }
+    ],
+    [
+      {
+        "date": "18.01.2013"
+      }
+    ],
+    [
+      {
+        "title": "18.01.2013"
+      }
+    ],
+    [
+      {
+        "publish": "False"
+      }
+    ],
+    [
+      {
+        "description": "delo"
+      }
+    ]
+  ]
+]
 
 TODO:
 ----
