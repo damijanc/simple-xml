@@ -1,3 +1,7 @@
+11/4/2013
+Added convertion to JSON with saveJSON method
+Updated tests
+Renamed generateXML to BuildDOM
 9/4/2013
 Added generation from CSV, updated code comments, added example, reorganized directory structure
 29/3/2013

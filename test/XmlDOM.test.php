@@ -47,11 +47,14 @@ $arr = array(
 
 $dom = new XmlDOM('1.0', 'utf-8');
 $dom->formatOutput = true;
-$dom->generateXML($arr,'books');
+$dom->BuildDOM($arr,'books');
 
 $xml = $dom->saveXML();
-
 echo $xml;
+
+$json= $dom->saveJSON(TRUE);
+echo $json;
+
 
 //and more simple example
 $arr = array(     'publishTime' => '18.01.2013 11:09:39',
@@ -63,11 +66,13 @@ $arr = array(     'publishTime' => '18.01.2013 11:09:39',
 
 $dom = new XmlDOM('1.0', 'utf-8');
 $dom->formatOutput = true;
-$dom->generateXML($arr, 'issue');
+$dom->BuildDOM($arr, 'issue');
 
 $xml = $dom->saveXML();
-
 echo $xml;
+
+$json= $dom->saveJSON(TRUE);
+echo $json;
 
 
 
@@ -75,8 +80,11 @@ echo $xml;
 $dom = new XmlDOM('1.0', 'utf-8');
 $dom->formatOutput = true;
 $dom->generateFromCSV(dirname(__FILE__).'/1968_69_Bayern_Munich.csv', 'players', 'player',',', 'de_DE');
-$xml = $dom->saveXML();
 
+$xml = $dom->saveXML();
 echo $xml;
+
+$json= $dom->saveJSON(TRUE);
+echo $json;
 
 ?>
