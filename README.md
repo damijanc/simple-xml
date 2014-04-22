@@ -1,7 +1,7 @@
 simple-xml
 ==========
 
-Simple wrapper for PHP (http://php.net/manual/en/book.ftp.php) DOMDocument
+Simple wrapper for PHP (http://www.php.net/manual/en/class.domdocument.php) DOMDocument
 
 Motivation for this class was to simplify creation of XML files 
 so instead of doing:
