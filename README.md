@@ -8,7 +8,7 @@ After roughly 11 years this lib is finally getting and update. It uses a nice PH
 # Something about XML itself
 Valid XML needs to start with xml version and encoding declaration like ```<?xml version="1.0" encoding="utf-8"?>```. XML without it is invalid.
 
-Library by default uses UTF-8 encoding. So please make sure that all your strings are in proper encoding
+Library by default uses UTF-8 encoding. So please make sure that all your strings are properly encoded.
 
 XML supports multiple type of text: text, CDATA and an element. 
 
