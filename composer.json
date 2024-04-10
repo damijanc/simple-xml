@@ -1,0 +1,26 @@
+{
+    "name": "damijanc/simple-xml",
+    "description": "DomDocument wrapper for XML generation",
+    "type": "library",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "damijanc\\SimpleXml\\": "src/",
+            "Tests\\": "tests/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Damijan Cavar",
+            "email": "damijan@cavar.si"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require-dev": {
+        "phpunit/phpunit": "^9"
+    },
+  "require": {
+    "ext-dom": "*",
+    "php": ">=8.2"
+  }
+}

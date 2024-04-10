@@ -1,0 +1,1 @@
+{"version":1,"defects":{"Tests\\XmlDOMTest::testBuildComplexXml":5,"Tests\\XmlDOMTest::testBook":5,"Tests\\XmlDOMTest::testBooks":5},"times":{"Tests\\XmlDOMTest::testBuildComplexXml":0.001,"Tests\\XmlDOMTest::testBook":0.001,"Tests\\XmlDOMTest::testBooks":0.001}}
