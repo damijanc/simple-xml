@@ -36,6 +36,13 @@ final class XmlDOMTest extends TestCase
         $book->price = '$43.29';
         $issue->books[] = $book;
 
+
+        $book = new Book();
+        $book->author = 'Damijanc';
+        $book->title = '&><';
+        $book->price = '$43.29';
+        $issue->books[] = $book;
+
         return $issue;
     }
 

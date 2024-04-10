@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace damijanc\SimpleXml;
 
+use damijanc\SimpleXml\Attribute\Comment;
 use damijanc\SimpleXml\Attribute\Node;
 use damijanc\SimpleXml\Attribute\Property;
 use DOMDocument;
@@ -15,24 +16,6 @@ use ReflectionClass;
  */
 class XmlDOM extends DOMDocument
 {
-
-    /**
-     * Removes non-printable chars from string
-     * @param string $in_str input string
-     * @param string $charset charset, defaults to UTF-8
-     * @return string string without non-printable chars
-     */
-    public function removeNonPrintable($in_str, $charset = 'UTF-8')
-    {
-        #remove all non utf8 characters
-        $in_str = mb_convert_encoding($in_str, $charset, $charset);
-
-        #Remove non printable character (i.e. below ascii code 32).
-        $in_str = preg_replace('/[\x00-\x08\x0B\x0C\x0E-\x1F]/u', '', $in_str);
-
-        return $in_str;
-    }
-
     private function isValidClass(mixed $x): bool
     {
         // not an object, not an instance
@@ -62,7 +45,7 @@ class XmlDOM extends DOMDocument
      * @param DOMElement|null $parentElement
      * @return void
      */
-    public function handlePropertyAttributes(array $propertyAttributes, ?DOMElement $parentElement,  $value): void
+    public function handlePropertyAttributes(array $propertyAttributes, ?DOMElement $parentElement, $value): void
     {
         if (count($propertyAttributes) === 0) {
             return;
@@ -70,6 +53,21 @@ class XmlDOM extends DOMDocument
 
         $propertyAttribute = $propertyAttributes[0]->newInstance();
         $this->appendAttribute([$propertyAttribute->key => $value], $parentElement);
+    }
+
+    /**
+     * @param array $commentAttributes
+     * @param DOMElement|null $parentElement
+     * @return void
+     */
+    public function handleCommentAttributes(array $commentAttributes, ?DOMElement $parentElement): void
+    {
+        if (count($commentAttributes) === 0) {
+            return;
+        }
+
+        $commentAttribute = $commentAttributes[0]->newInstance();
+        $this->appendComment($commentAttribute->comment, $parentElement);
 
     }
 
@@ -89,7 +87,7 @@ class XmlDOM extends DOMDocument
 
     private function handleNodeAttribute(Node $nodeAttribute, ?DOMElement &$parentNode, DOMElement &$currentNode = null): void
     {
-        $this->makeElement($nodeAttribute->name, $parentNode,  $currentNode);
+        $this->makeElement($nodeAttribute->name, $parentNode, $currentNode);
     }
 
     public function buildDOM(object $mixed, DOMElement &$parentElement = null): void
@@ -114,8 +112,7 @@ class XmlDOM extends DOMDocument
         //get all class properties
         $reflectionProperties = $reflectionClass->getProperties();
 
-        foreach ($reflectionProperties as $reflectionProperty)
-        {
+        foreach ($reflectionProperties as $reflectionProperty) {
             if ($reflectionProperty->isInitialized($mixed) === false) {
                 continue;
             }
@@ -130,17 +127,16 @@ class XmlDOM extends DOMDocument
                         continue;
                     }
 
-                    $this->buildDOM($value,$parentElement); //parent is a node we want to attach to
+                    $this->buildDOM($value, $parentElement); //parent is a node we want to attach to
                     $parentElement = $domElement; //setting the parent back
                 }
             }
 
             $propertyAttributes = $reflectionProperty->getAttributes();
 
-            if (count($propertyAttributes)  === 0) {
+            if (count($propertyAttributes) === 0) {
                 continue;
             }
-
 
             //if property is a node create a node
             $propertyNodeAttributes = $reflectionProperty->getAttributes(Node::class);
@@ -155,12 +151,13 @@ class XmlDOM extends DOMDocument
             $propertyPropertyAttributes = $reflectionProperty->getAttributes(Property::class);
             $this->handlePropertyAttributes($propertyPropertyAttributes, $domElement, $propertyValue); //create a property
 
+            $propertyCommentAttributes = $reflectionProperty->getAttributes(Comment::class);
+            $this->handleCommentAttributes($propertyCommentAttributes, $domElement); //create a comment
+
             //if we do not have the property just put out the value
             $this->appendText($reflectionProperty->getValue($mixed), $domElement);
 
-
         }
-
     }
 
     private function makeElement(string $nodeName, &$parentNode, &$currentNode)
@@ -197,5 +194,10 @@ class XmlDOM extends DOMDocument
     private function appendCData(string $text, DOMElement &$domElement): void
     {
         $domElement->appendChild($this->createCDATASection($text));
+    }
+
+    private function appendComment(string $text, DOMElement &$domElement): void
+    {
+        $domElement->appendChild($this->createComment($text));
     }
 }
