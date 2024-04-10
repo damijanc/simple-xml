@@ -155,6 +155,10 @@ class XmlDOM extends DOMDocument
             $propertyPropertyAttributes = $reflectionProperty->getAttributes(Property::class);
             $this->handlePropertyAttributes($propertyPropertyAttributes, $domElement, $propertyValue); //create a property
 
+            //if we do not have the property just put out the value
+            $this->appendText($reflectionProperty->getValue($mixed), $domElement);
+
+
         }
 
     }
@@ -185,13 +189,13 @@ class XmlDOM extends DOMDocument
         }
     }
 
-    private function appendCData(array $arr, DOMElement &$domElement)
+    private function appendText(string $text, DOMElement &$domElement): void
     {
-        if (is_array($arr)) {
-            //attributes must be key/value pairs and can't have childs
-            foreach ($arr as $value) {
-                $domElement->appendChild($this->createCDATASection($value));
-            }
-        }
+        $domElement->appendChild($this->createTextNode($text));
+    }
+
+    private function appendCData(string $text, DOMElement &$domElement): void
+    {
+        $domElement->appendChild($this->createCDATASection($text));
     }
 }
