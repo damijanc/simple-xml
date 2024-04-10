@@ -5,7 +5,6 @@ namespace damijanc\SimpleXml;
 
 use damijanc\SimpleXml\Attribute\Node;
 use damijanc\SimpleXml\Attribute\Property;
-use damijanc\SimpleXml\Attribute\RootNode;
 use DOMDocument;
 use DOMElement;
 use Exception;
@@ -107,11 +106,12 @@ class XmlDOM extends DOMDocument
 
         $nodeAttributes = $reflectionClass->getAttributes(Node::class);
         $this->handleNodeAttributes($nodeAttributes, $parentElement, $domElement);
+        $parentElement = $domElement; //class node is always a parent
 
         $propertyAttributes = $reflectionClass->getAttributes(Property::class);
         $this->handleClassAttributes($propertyAttributes, $parentElement);
 
-        //get all properties
+        //get all class properties
         $reflectionProperties = $reflectionClass->getProperties();
 
         foreach ($reflectionProperties as $reflectionProperty)
@@ -130,7 +130,8 @@ class XmlDOM extends DOMDocument
                         continue;
                     }
 
-                    $this->buildDOM($value,$parentElement);
+                    $this->buildDOM($value,$parentElement); //parent is a node we want to attach to
+                    $parentElement = $domElement; //setting the parent back
                 }
             }
 
@@ -142,13 +143,17 @@ class XmlDOM extends DOMDocument
 
 
             //if property is a node create a node
-            $domElement = null; //we have a parent, we need to create a child
             $propertyNodeAttributes = $reflectionProperty->getAttributes(Node::class);
-            $this->handleNodeAttributes($propertyNodeAttributes, $parentElement, $domElement);
 
-            //if mode has a property create a property
+            if (count($propertyNodeAttributes) === 0) { //if there is no node there is nothing to do
+                continue;
+            }
+            $domElement = null; //we have a parent, we need to create a child
+            $this->handleNodeAttributes($propertyNodeAttributes, $parentElement, $domElement); //create a node
+
+            //if node has a property create a property, we can't have a property without a node
             $propertyPropertyAttributes = $reflectionProperty->getAttributes(Property::class);
-            $this->handlePropertyAttributes($propertyPropertyAttributes, $domElement, $propertyValue);
+            $this->handlePropertyAttributes($propertyPropertyAttributes, $domElement, $propertyValue); //create a property
 
         }
 

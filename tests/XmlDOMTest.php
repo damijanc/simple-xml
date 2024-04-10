@@ -18,23 +18,23 @@ final class XmlDOMTest extends TestCase
         $book->author = 'George Orwell';
         $book->title = '1984';
         $issue->books[] = $book;
-//
-//        $book = new Book();
-//        $book->author = 'Lojze Slak';
-//        $book->title = 'S harmoniko po svetu';
-//        $issue->books[] = $book;
-//
-//        $book = new Book();
-//        $book->author = 'Isaac Asimov';
-//        $book->title = 'Foundation';
-//        $book->price = '$15.61';
-//        $issue->books[] = $book;
-//
-//        $book = new Book();
-//        $book->author = 'Robert A Heinlein';
-//        $book->title = 'Stranger in a Strange Land';
-//        $book->price = '$43.29';
-//        $issue->books[] = $book;
+
+        $book = new Book();
+        $book->author = 'Lojze Slak';
+        $book->title = 'S harmoniko po svetu';
+        $issue->books[] = $book;
+
+        $book = new Book();
+        $book->author = 'Isaac Asimov';
+        $book->title = 'Foundation';
+        $book->price = '$15.61';
+        $issue->books[] = $book;
+
+        $book = new Book();
+        $book->author = 'Robert A Heinlein';
+        $book->title = 'Stranger in a Strange Land';
+        $book->price = '$43.29';
+        $issue->books[] = $book;
 
         return $issue;
     }
