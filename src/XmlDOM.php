@@ -16,79 +16,6 @@ use ReflectionClass;
  */
 class XmlDOM extends DOMDocument
 {
-    private function isValidClass(mixed $x): bool
-    {
-        // not an object, not an instance
-        if (!is_object($x)) {
-            return false;
-        }
-
-        return ($x = get_class($x)) && $x !== 'stdClass';
-    }
-
-    /**
-     * @param array $propertyAttributes
-     * @param DOMElement|null $parentElement
-     * @return void
-     */
-    public function handleClassAttributes(array $propertyAttributes, ?DOMElement $parentElement): void
-    {
-        if (count($propertyAttributes) === 0) {
-            return;
-        }
-
-        $this->handlePropertyAttribute($propertyAttributes[0]->newInstance(), $parentElement);
-    }
-
-    /**
-     * @param array $propertyAttributes
-     * @param DOMElement|null $parentElement
-     * @return void
-     */
-    public function handlePropertyAttributes(array $propertyAttributes, ?DOMElement $parentElement, $value): void
-    {
-        if (count($propertyAttributes) === 0) {
-            return;
-        }
-
-        $propertyAttribute = $propertyAttributes[0]->newInstance();
-        $this->appendAttribute([$propertyAttribute->key => $value], $parentElement);
-    }
-
-    /**
-     * @param array $commentAttributes
-     * @param DOMElement|null $parentElement
-     * @return void
-     */
-    public function handleCommentAttributes(array $commentAttributes, ?DOMElement $parentElement): void
-    {
-        if (count($commentAttributes) === 0) {
-            return;
-        }
-
-        $commentAttribute = $commentAttributes[0]->newInstance();
-        $this->appendComment($commentAttribute->comment, $parentElement);
-
-    }
-
-    private function handleNodeAttributes(array $nodeAttributes, ?DOMElement &$parentElement, DOMElement &$domElement = null): void
-    {
-        if (count($nodeAttributes) === 0) {
-            return;
-        }
-
-        $this->handleNodeAttribute($nodeAttributes[0]->newInstance(), $parentElement, $domElement);
-    }
-
-    private function handlePropertyAttribute(Property $propertyAttribute, ?DOMElement $parentElement): void
-    {
-        $this->appendAttribute([$propertyAttribute->key => $propertyAttribute->value], $parentElement);
-    }
-
-    private function handleNodeAttribute(Node $nodeAttribute, ?DOMElement &$parentNode, DOMElement &$currentNode = null): void
-    {
-        $this->makeElement($nodeAttribute->name, $parentNode, $currentNode);
-    }
 
     public function buildDOM(object $mixed, DOMElement &$parentElement = null): void
     {
@@ -158,6 +85,80 @@ class XmlDOM extends DOMDocument
             $this->appendText($reflectionProperty->getValue($mixed), $domElement);
 
         }
+    }
+
+    private function isValidClass(mixed $x): bool
+    {
+        // not an object, not an instance
+        if (!is_object($x)) {
+            return false;
+        }
+
+        return ($x = get_class($x)) && $x !== 'stdClass';
+    }
+
+    /**
+     * @param array $propertyAttributes
+     * @param DOMElement|null $parentElement
+     * @return void
+     */
+    private function handleClassAttributes(array $propertyAttributes, ?DOMElement $parentElement): void
+    {
+        if (count($propertyAttributes) === 0) {
+            return;
+        }
+
+        $this->handlePropertyAttribute($propertyAttributes[0]->newInstance(), $parentElement);
+    }
+
+    /**
+     * @param array $propertyAttributes
+     * @param DOMElement|null $parentElement
+     * @return void
+     */
+    private function handlePropertyAttributes(array $propertyAttributes, ?DOMElement $parentElement, $value): void
+    {
+        if (count($propertyAttributes) === 0) {
+            return;
+        }
+
+        $propertyAttribute = $propertyAttributes[0]->newInstance();
+        $this->appendAttribute([$propertyAttribute->key => $value], $parentElement);
+    }
+
+    /**
+     * @param array $commentAttributes
+     * @param DOMElement|null $parentElement
+     * @return void
+     */
+    private function handleCommentAttributes(array $commentAttributes, ?DOMElement $parentElement): void
+    {
+        if (count($commentAttributes) === 0) {
+            return;
+        }
+
+        $commentAttribute = $commentAttributes[0]->newInstance();
+        $this->appendComment($commentAttribute->comment, $parentElement);
+
+    }
+
+    private function handleNodeAttributes(array $nodeAttributes, ?DOMElement &$parentElement, DOMElement &$domElement = null): void
+    {
+        if (count($nodeAttributes) === 0) {
+            return;
+        }
+
+        $this->handleNodeAttribute($nodeAttributes[0]->newInstance(), $parentElement, $domElement);
+    }
+
+    private function handlePropertyAttribute(Property $propertyAttribute, ?DOMElement $parentElement): void
+    {
+        $this->appendAttribute([$propertyAttribute->key => $propertyAttribute->value], $parentElement);
+    }
+
+    private function handleNodeAttribute(Node $nodeAttribute, ?DOMElement &$parentNode, DOMElement &$currentNode = null): void
+    {
+        $this->makeElement($nodeAttribute->name, $parentNode, $currentNode);
     }
 
     private function makeElement(string $nodeName, &$parentNode, &$currentNode)
