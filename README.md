@@ -115,7 +115,5 @@ I might change this implementation later. For now, I do not have any real use ca
 
 # A word about performance
 
-I did not so far do a serious performance testing. If you encounter performance problems please let me know. 
-One thing that comes to my mind is to cache the reflection classes as I am essentially constantly using reflection on same classes. 
-
+I did manage to generate XML from 50k classes in 300ms, therefor I believe it is fast enough. Would be nice if someone can confirm it.
 
