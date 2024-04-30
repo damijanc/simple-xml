@@ -11,10 +11,13 @@ use damijanc\SimpleXml\Attribute\Text;
 #[Node('book')]
 class Book
 {
-    #[Node('author')]
+
     #[Property('name', null)]
-    #[Text]
+    #[Property('data-link', 'some-dummy-link')]
     public string $author;
+
+    #[Property('genre', null)]
+    public string $genre;
 
     #[Node('title')]
     #[CData()]

@@ -4,7 +4,7 @@ namespace Tests;
 
 use damijanc\SimpleXml\XmlDOM;
 use Tests\fixtures\Book;
-use Tests\fixtures\Books ;
+use Tests\fixtures\Books;
 use PHPUnit\Framework\TestCase;
 
 final class XmlDOMTest extends TestCase
@@ -54,7 +54,8 @@ final class XmlDOMTest extends TestCase
         $dom->buildDOM($this->prepareBooks());
 
         $xml = $dom->saveXML();
-        echo $xml;
+
+        $this->assertXmlStringEqualsXmlString(file_get_contents(__DIR__.'/fixtures/books.xml'), $xml);
     }
 
     public function testBook()
@@ -63,13 +64,14 @@ final class XmlDOMTest extends TestCase
         $book->author = 'George Orwell';
         $book->title = '1984';
         $book->price = '$9.99';
+        $book->genre = 'sci-fi';
 
         $dom = new XmlDOM('1.0', 'utf-8');
         $dom->formatOutput = true;
         $dom->buildDOM($book);
 
         $xml = $dom->saveXML();
-        echo $xml;
+        $this->assertXmlStringEqualsXmlString(file_get_contents(__DIR__.'/fixtures/book.xml'), $xml);
 
     }
 }

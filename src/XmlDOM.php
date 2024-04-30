@@ -10,6 +10,7 @@ use DOMDocument;
 use DOMElement;
 use Exception;
 use ReflectionClass;
+use ReflectionProperty;
 
 /**
  * Simple XML document generator
@@ -65,14 +66,12 @@ class XmlDOM extends DOMDocument
                 continue;
             }
 
-            //if property is a node create a node
-            $propertyNodeAttributes = $reflectionProperty->getAttributes(Node::class);
+            $propertyNodeAttributes = $this->getPropertyNodeAttributes($reflectionProperty, $parentElement, $domElement); //create a node if property is a node
 
-            if (count($propertyNodeAttributes) === 0) { //if there is no node there is nothing to do
-                continue;
+            if ($propertyNodeAttributes) {
+                $domElement = null; //we have a parent, we need to create a child
+                $this->handleNodeAttributes($propertyNodeAttributes, $parentElement, $domElement); //create a node
             }
-            $domElement = null; //we have a parent, we need to create a child
-            $this->handleNodeAttributes($propertyNodeAttributes, $parentElement, $domElement); //create a node
 
             //if node has a property create a property, we can't have a property without a node
             $propertyPropertyAttributes = $reflectionProperty->getAttributes(Property::class);
@@ -81,10 +80,25 @@ class XmlDOM extends DOMDocument
             $propertyCommentAttributes = $reflectionProperty->getAttributes(Comment::class);
             $this->handleCommentAttributes($propertyCommentAttributes, $domElement); //create a comment
 
-            //if we do not have the property just put out the value
-            $this->appendText($reflectionProperty->getValue($mixed), $domElement);
+            //if we have a node that does not have properties just put out the value
+            if ($propertyNodeAttributes) {
+                $this->appendText((string)$reflectionProperty->getValue($mixed), $domElement);
+            }
 
         }
+    }
+
+    private function getPropertyNodeAttributes(ReflectionProperty $reflectionProperty,?DOMElement &$parentElement, DOMElement &$domElement = null): ?array
+    {
+        //if property is a node create a node
+        $propertyNodeAttributes = $reflectionProperty->getAttributes(Node::class);
+
+        if (count($propertyNodeAttributes) === 0) { //if there is no node there is nothing to do
+            return null;
+        }
+
+        return $propertyNodeAttributes;
+
     }
 
     private function isValidClass(mixed $x): bool
@@ -122,8 +136,15 @@ class XmlDOM extends DOMDocument
             return;
         }
 
-        $propertyAttribute = $propertyAttributes[0]->newInstance();
-        $this->appendAttribute([$propertyAttribute->key => $value], $parentElement);
+        foreach ($propertyAttributes as $propertyAttribute) {
+            $instance = $propertyAttribute->newInstance();
+            if ($instance->value === null) {
+                $this->appendAttribute([$instance->key => $value], $parentElement);
+                continue;
+            }
+            $this->appendAttribute([$instance->key => $instance->value], $parentElement);
+
+        }
     }
 
     /**

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<books type="fiction">
+    <book name="George Orwell" data-link="some-dummy-link">
+        <title>1984</title>
+    </book>
+    <book name="Lojze Slak" data-link="some-dummy-link">
+        <title>S harmoniko po svetu</title>
+    </book>
+    <book name="Isaac Asimov" data-link="some-dummy-link">
+        <title>Foundation</title>
+        <price><!--Better be cheap enough!-->$15.61</price>
+    </book>
+    <book name="Robert A Heinlein" data-link="some-dummy-link">
+        <title>Stranger in a Strange Land</title>
+        <price><!--Better be cheap enough!-->$43.29</price>
+    </book>
+    <book name="Damijanc" data-link="some-dummy-link">
+        <title>&amp;&gt;&lt;</title>
+        <price><!--Better be cheap enough!-->$43.29</price>
+    </book>
+</books>
