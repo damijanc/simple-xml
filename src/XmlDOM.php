@@ -115,9 +115,6 @@ class XmlDOM
             if ($propertyNodeAttributes) {
                 $this->appendText((string)$propertyValue, $domElement);
             }
-
-            //set parent back to class node
-
         }
     }
 

@@ -113,6 +113,46 @@ I might change this implementation later. For now, I do not have any real use ca
 
 # Supported attributes
 
+```php
+#[Node('book')]
+class Book
+{
+    #[Property('name', null)]
+    #[Property('data-link', 'some-dummy-link')]
+    public string $author;
+} 
+
+```
+Propery attribute will add a propery to a node. It accepts two values name and value. If value is null it will be read from class property.
+We also have a support for multiple properties attributes that can added to mutiple class properties. Example above will attach properties 
+to parent node as Node attribute is not defined. In the case in the example we would get
+```xml
+<book name="George Orwell" data-link="some-dummy-link"/>
+```
+
+Another example with Node attribute
+```php
+#[Node('book')]
+class Book
+{
+    #[Node('author')]
+    #[Property('data-link', 'some-dummy-link')]
+    public string $author;
+} 
+
+```
+will result in:
+```xml
+<book data-link="some-dummy-link">
+    <author>George Orwell</author>
+</book>
+```
+
+
+
+## Property
+
+
 # A word about performance
 
 I did manage to generate XML from 50k classes in 300ms, therefor I believe it is fast enough. Would be nice if someone can confirm it.
