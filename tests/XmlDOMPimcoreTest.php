@@ -69,15 +69,25 @@ final class XmlDOMPimcoreTest extends TestCase
         return $pimcoreImages;
     }
 
+    public function testDatasheetDE()
+    {
+        $dom = new XmlDOM('1.0', 'utf-8');
+        //$dom->formatOutput = true;
+        $dom->buildDOM($this->prepareDatasheetDE());
+
+        $xml = $dom->saveXML();
+        $this->assertXmlStringEqualsXmlString(file_get_contents(__DIR__.'/fixtures/Pimcore/Datasheet_DE.xml'), $xml);
+    }
+
 
     public function testPimcoreProduct()
     {
         $dom = new XmlDOM('1.0', 'utf-8');
-        $dom->formatOutput = true;
+        //$dom->formatOutput = true;
         $dom->buildDOM($this->preparePimcoreProduct());
 
         $xml = $dom->saveXML();
-        echo $xml;
+        $this->assertXmlStringEqualsXmlString(file_get_contents(__DIR__.'/fixtures/Pimcore/PimcoreProduct.xml'), $xml);
     }
 }
 

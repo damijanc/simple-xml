@@ -6,6 +6,7 @@ use damijanc\SimpleXml\Attribute\Node;
 use damijanc\SimpleXml\Attribute\Property;
 use damijanc\SimpleXml\Attribute\Text;
 
+#[Node('product')]
 class PimcoreProduct
 {
 
@@ -19,14 +20,13 @@ class PimcoreProduct
 
     public PimcoreImages $images;
 
-    #[Node('NAME_AT')]
-    #[Text]
-    public string $nameAT;
-
     #[Node('NAME_DE')]
     #[Text]
     public string $nameDE;
 
+    #[Node('NAME_AT')]
+    #[Text]
+    public string $nameAT;
 
     #[Node('MANUFACTURER')]
     #[Property('sapId', null)]
@@ -35,7 +35,7 @@ class PimcoreProduct
     #[Node('PUBLISHED')]
     public int $published;
 
-    public DatasheetAT $datasheetAT;
-
     public DatasheetDE $datasheetDE;
+
+    public DatasheetAT $datasheetAT;
 }

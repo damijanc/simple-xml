@@ -50,7 +50,6 @@ final class XmlDOMTest extends TestCase
     public function testBooks()
     {
         $dom = new XmlDOM('1.0', 'utf-8');
-        $dom->formatOutput = true;
         $dom->buildDOM($this->prepareBooks());
 
         $xml = $dom->saveXML();
@@ -67,7 +66,6 @@ final class XmlDOMTest extends TestCase
         $book->genre = 'sci-fi';
 
         $dom = new XmlDOM('1.0', 'utf-8');
-        $dom->formatOutput = true;
         $dom->buildDOM($book);
 
         $xml = $dom->saveXML();

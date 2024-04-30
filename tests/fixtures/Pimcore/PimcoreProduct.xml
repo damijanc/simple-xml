@@ -9,10 +9,10 @@
     <NAME_AT>PLURAZID PURE, 1L Fl </NAME_AT>
     <MANUFACTURER sapId="131697"/>
     <PUBLISHED>1</PUBLISHED>
-    <DATASHEET_AT>
-        <ASSET title="TitleAT" path="/somepath/datasheet.pdf" md5="7daf75de6faef4e1c6aa2257300a84fe"/>
-    </DATASHEET_AT>
     <DATASHEET_DE>
         <ASSET title="TitleDE" path="/somepath/datasheet.pdf" md5="7daf75de6faef4e1c6aa2257300a84fe"/>
     </DATASHEET_DE>
+    <DATASHEET_AT>
+        <ASSET title="TitleAT" path="/somepath/datasheet.pdf" md5="7daf75de6faef4e1c6aa2257300a84fe"/>
+    </DATASHEET_AT>
 </product>

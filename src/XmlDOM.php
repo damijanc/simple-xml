@@ -15,8 +15,21 @@ use ReflectionProperty;
 /**
  * Simple XML document generator
  */
-class XmlDOM extends DOMDocument
+class XmlDOM
 {
+
+    private DOMDocument $domDocument;
+
+    public function __construct(string $version = '1.0', string $encoding = 'UTF-8')
+    {
+        $this->domDocument = new DOMDocument($version, $encoding);
+    }
+
+    public function saveXML(bool $formatOutput = true): string
+    {
+        $this->domDocument->formatOutput = $formatOutput;
+        return $this->domDocument->saveXML();
+    }
 
     public function buildDOM(object $mixed, DOMElement &$parentElement = null): void
     {
@@ -32,10 +45,11 @@ class XmlDOM extends DOMDocument
 
         $nodeAttributes = $reflectionClass->getAttributes(Node::class);
         $this->handleNodeAttributes($nodeAttributes, $parentElement, $domElement);
-        $parentElement = $domElement; //class node is always a parent
+        $classNodeElement = $domElement; //class node is always a parent
 
+        //properties that belong to class node
         $propertyAttributes = $reflectionClass->getAttributes(Property::class);
-        $this->handleClassAttributes($propertyAttributes, $parentElement);
+        $this->handleClassAttributes($propertyAttributes, $classNodeElement);
 
         //get all class properties
         $reflectionProperties = $reflectionClass->getProperties();
@@ -44,6 +58,8 @@ class XmlDOM extends DOMDocument
             if ($reflectionProperty->isInitialized($mixed) === false) {
                 continue;
             }
+
+            $attributeNode = null;
 
             $reflectionProperty->setAccessible(true); //if property is private/protected we need to make it accessible
             $propertyValue = $reflectionProperty->getValue($mixed); //you need to have an instance of a class to be able to get a value
@@ -55,9 +71,17 @@ class XmlDOM extends DOMDocument
                         continue;
                     }
 
-                    $this->buildDOM($value, $parentElement); //parent is a node we want to attach to
-                    $parentElement = $domElement; //setting the parent back
+                    $this->buildDOM($value, $classNodeElement); //array will always attac to class node
+                    //$parentElement = $domElement; //setting the parent back
                 }
+                continue;
+            }
+
+            //for class we do not need attributes
+            if ($this->isValidClass($propertyValue)) {
+                $this->buildDOM($propertyValue, $classNodeElement); //parent is a node we want to attach to
+                //$parentElement = $domElement; //setting the parent back
+                continue;
             }
 
             $propertyAttributes = $reflectionProperty->getAttributes();
@@ -66,29 +90,38 @@ class XmlDOM extends DOMDocument
                 continue;
             }
 
-            $propertyNodeAttributes = $this->getPropertyNodeAttributes($reflectionProperty, $parentElement, $domElement); //create a node if property is a node
+            $propertyNodeAttributes = $this->getPropertyNodeAttributes($reflectionProperty); //create a node if property is a node
 
             if ($propertyNodeAttributes) {
                 $domElement = null; //we have a parent, we need to create a child
-                $this->handleNodeAttributes($propertyNodeAttributes, $parentElement, $domElement); //create a node
+                $this->handleNodeAttributes($propertyNodeAttributes, $classNodeElement, $domElement); //create a node
+                $attributeNode = $domElement; //just created node is a parent
             }
+
+            $domElement = $attributeNode ?? $classNodeElement; //if we have a node we need to attach to it, otherwise attach to class node
 
             //if node has a property create a property, we can't have a property without a node
             $propertyPropertyAttributes = $reflectionProperty->getAttributes(Property::class);
-            $this->handlePropertyAttributes($propertyPropertyAttributes, $domElement, $propertyValue); //create a property
+            $valueAsAttributeValue = $this->handlePropertyAttributes($propertyPropertyAttributes, $domElement, $propertyValue); //create a property
+
+            if ($valueAsAttributeValue) {
+                continue;
+            }
 
             $propertyCommentAttributes = $reflectionProperty->getAttributes(Comment::class);
             $this->handleCommentAttributes($propertyCommentAttributes, $domElement); //create a comment
 
             //if we have a node that does not have properties just put out the value
             if ($propertyNodeAttributes) {
-                $this->appendText((string)$reflectionProperty->getValue($mixed), $domElement);
+                $this->appendText((string)$propertyValue, $domElement);
             }
+
+            //set parent back to class node
 
         }
     }
 
-    private function getPropertyNodeAttributes(ReflectionProperty $reflectionProperty,?DOMElement &$parentElement, DOMElement &$domElement = null): ?array
+    private function getPropertyNodeAttributes(ReflectionProperty $reflectionProperty): ?array
     {
         //if property is a node create a node
         $propertyNodeAttributes = $reflectionProperty->getAttributes(Node::class);
@@ -130,21 +163,26 @@ class XmlDOM extends DOMDocument
      * @param DOMElement|null $parentElement
      * @return void
      */
-    private function handlePropertyAttributes(array $propertyAttributes, ?DOMElement $parentElement, $value): void
+    private function handlePropertyAttributes(array $propertyAttributes, ?DOMElement $parentElement, $value): bool
     {
+        $valueAsAttributeValue = false;
+
         if (count($propertyAttributes) === 0) {
-            return;
+            return $valueAsAttributeValue;
         }
 
         foreach ($propertyAttributes as $propertyAttribute) {
             $instance = $propertyAttribute->newInstance();
             if ($instance->value === null) {
                 $this->appendAttribute([$instance->key => $value], $parentElement);
+                $valueAsAttributeValue = true;
                 continue;
             }
             $this->appendAttribute([$instance->key => $instance->value], $parentElement);
 
         }
+
+        return $valueAsAttributeValue;
     }
 
     /**
@@ -185,11 +223,11 @@ class XmlDOM extends DOMDocument
     private function makeElement(string $nodeName, &$parentNode, &$currentNode)
     {
         if (is_null($currentNode)) { //if we have a node we do nothing
-            $currentNode = $this->createElement($nodeName);
+            $currentNode = $this->domDocument->createElement($nodeName);
             if (is_null($parentNode)) {
                 $parentNode = $currentNode;
                 //if we have no parent append it to the root
-                $this->appendChild($currentNode);
+                $this->domDocument->appendChild($currentNode);
             } else {
                 $parentNode->appendChild($currentNode);
             }
@@ -201,7 +239,7 @@ class XmlDOM extends DOMDocument
         if (is_array($arr)) {
             //attributes must be key/value pairs and can't have children
             foreach ($arr as $key => $value) {
-                $domAttribute = $this->createAttribute($key);
+                $domAttribute = $this->domDocument->createAttribute($key);
                 $domAttribute->value = $value;
                 $domElement->appendChild($domAttribute);
             }
@@ -210,16 +248,16 @@ class XmlDOM extends DOMDocument
 
     private function appendText(string $text, DOMElement &$domElement): void
     {
-        $domElement->appendChild($this->createTextNode($text));
+        $domElement->appendChild($this->domDocument->createTextNode($text));
     }
 
     private function appendCData(string $text, DOMElement &$domElement): void
     {
-        $domElement->appendChild($this->createCDATASection($text));
+        $domElement->appendChild($this->domDocument->createCDATASection($text));
     }
 
     private function appendComment(string $text, DOMElement &$domElement): void
     {
-        $domElement->appendChild($this->createComment($text));
+        $domElement->appendChild($this->domDocument->createComment($text));
     }
 }
